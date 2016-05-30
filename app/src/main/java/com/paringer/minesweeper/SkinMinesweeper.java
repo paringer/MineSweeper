@@ -38,6 +38,22 @@ public class SkinMinesweeper {
         cover = context.getResources().getDrawable(R.drawable.minesweeper_unopened_square);
     }
 
+    public void clear(){
+        m0red = null;
+        m0 = null;
+        m1 = null;
+        m2 = null;
+        m3 = null;
+        m4 = null;
+        m5 = null;
+        m6 = null;
+        m7 = null;
+        m8 = null;
+        mine = null;
+        flag = null;
+        cover = null;
+    }
+
     Drawable getBackgroundDrawable(Element el) {
         if (el == null) return null;
         if (!el.isOpened())

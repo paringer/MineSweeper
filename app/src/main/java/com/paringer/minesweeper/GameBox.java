@@ -54,6 +54,16 @@ public class GameBox implements View.OnClickListener, View.OnLongClickListener {
         board.prepareViews(context, skin, gridLayout, this);
     }
 
+    public void clear(){
+        board.clear();
+        board = null;
+        skin.clear();
+        skin = null;
+        movesAmount = 0;
+        mCheat = true;
+        onGameStateListener = null;
+    }
+
     public void setOnGameStateListener(OnGameStateListener onGameStateListener) {
         this.onGameStateListener = onGameStateListener;
     }
@@ -88,7 +98,7 @@ public class GameBox implements View.OnClickListener, View.OnLongClickListener {
         int y = cc / sizeX;
         if(!board.isOpened(x,y)){board.toggleFlag(x, y);}
         board.updateView(skin, x, y);
-        if(onGameStateListener!=null) onGameStateListener.onCellMarkedByFlag(board.minesMarked, board.minesTotal);
+        if(onGameStateListener!=null) onGameStateListener.onCellMarkedByFlag(board.getMinesMarked(), board.getMinesTotal());
         v.invalidate();
         if(checkWinConditions()){
             if(onGameStateListener!=null) onGameStateListener.onGameWon();
@@ -108,15 +118,14 @@ public class GameBox implements View.OnClickListener, View.OnLongClickListener {
             board.addMines(skin, x, y);
         }
         movesAmount += 1;
-//        if(board.hasMine(x, y)){
-            //game over
-//            if(onGameStateListener!=null) onGameStateListener.onGameOver();
-//        }
         boolean notBad = openRecursive(x, y);
         if(!notBad){
+            //game over
             if(onGameStateListener!=null) onGameStateListener.onGameOver();
+            if(onGameStateListener!=null) onGameStateListener.onCellMarkedByFlag(board.getMinesMarked(), board.getMinesTotal());
         }
         if(checkWinConditions()){
+            //game won
             if(onGameStateListener!=null) onGameStateListener.onGameWon();
         }
         board.updateView(skin, x, y);

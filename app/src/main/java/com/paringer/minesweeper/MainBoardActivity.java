@@ -29,7 +29,6 @@ import java.util.GregorianCalendar;
 
 public class MainBoardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, View.OnLongClickListener, OnGameStateListener {
-    Board board;
     GameBox game;
 
     @Override
@@ -93,6 +92,26 @@ public class MainBoardActivity extends AppCompatActivity
             })
             .show();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        game.clear();
+        game.setOnGameStateListener(null);
+        game = null;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        game.setOnGameStateListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        game.setOnGameStateListener(null);
     }
 
     public int getWidth() {

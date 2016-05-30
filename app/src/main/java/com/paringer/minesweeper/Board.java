@@ -24,13 +24,11 @@ public class Board {
     int openedFree = 0;
     Element[][] elements;
     HashSet<Element> set = new HashSet<>();
-//    SkinMinesweeper skin;
 
     public Board(Context context, int sizeY, int sizeX, int numMines) {//, SkinMinesweeper skin
         this.sizeY = sizeY;
         this.sizeX = sizeX;
         this.minesTotal = numMines;
-//        this.skin = skin;
         elements = new Element[sizeX][sizeY];
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
@@ -40,26 +38,26 @@ public class Board {
 
     }
 
+    public void clear() {
+        minesFound = 0;
+        minesMarked = 0;
+        openedFree = 0;
+        set.clear();
+        for (int x = 0; x < sizeX; x++)
+            for (int y = 0; y < sizeY; y++)
+                elements[x][y].clear();
+    }
+
     public void prepareViews(Context context, SkinMinesweeper skin, GridLayout gridLayout, GameBox gameBox){
         gridLayout.removeAllViewsInLayout();
         gridLayout.setColumnCount(sizeX);
         gridLayout.setRowCount(sizeY);
 //        gridLayout.setScrollContainer(false);
         gridLayout.setUseDefaultMargins(false);
-//        gridLayout.setAlignmentMode(GridLayout.ALIGN_BOUNDS);
-//        Configuration configuration = context.getResources().getConfiguration();
-//        if ((configuration.orientation == Configuration.ORIENTATION_PORTRAIT)) {
-//            gridLayout.setColumnOrderPreserved(false);
-//        } else {
-//            gridLayout.setRowOrderPreserved(false);
-//        }
-//        gridLayout.setColumnOrderPreserved(true);
-//        gridLayout.setRowOrderPreserved(true);
+        gridLayout.setAlignmentMode(GridLayout.ALIGN_BOUNDS);
+        gridLayout.setColumnOrderPreserved(true);
+        gridLayout.setRowOrderPreserved(true);
         gridLayout.setClipChildren(true);
-
-//        GridLayout.LayoutParams lp = new GridLayout.LayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-//        lp.setGravity(Gravity.CENTER);
-//        gridLayout.setLayoutParams(new RelativeLayout.LayoutParams(lp));
 
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
@@ -77,8 +75,8 @@ public class Board {
     /**
      * @field minesTotal is mines total number
      * @param skin       is current skin
-     * @param notX       is not x of start point, where first clicked
-     * @param notY       is not y of start point, where first clicked
+     * @param notX       is x of start point, mines free cell, where first clicked
+     * @param notY       is y of start point, mines free cell, where first clicked
      */
     public void addMines(SkinMinesweeper skin, int notX, int notY) {
         clearMines();
@@ -98,6 +96,7 @@ public class Board {
         minesFound = 0;
         minesMarked = 0;
         openedFree = 0;
+        set.clear();
         for (int x = 0; x < sizeX; x++)
             for (int y = 0; y < sizeY; y++)
                 elements[x][y].clearMine();
@@ -150,6 +149,7 @@ public class Board {
     public boolean openRecursive(int x, int y, boolean isManualClickAndMustBeOpened){
         Element element = elements[x][y];
         if(isManualClickAndMustBeOpened){set.clear();}
+        if(set.contains(element)) return true;
         set.add(element);
 
         if(element.isFlagged()&&element.hasMine()){
@@ -157,9 +157,11 @@ public class Board {
         }
         if(element.hasMine() && ! element.isFlagged()){
             element.setTriggered(true);
+            if(! element.isOpened()){
+                minesMarked++;
+                minesFound++;
+            }
             element.setOpened(true);
-            minesMarked++;
-            minesFound++;
 
             return false;
         }
